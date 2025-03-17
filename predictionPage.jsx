@@ -352,7 +352,7 @@ const toggleOption = (option) => {
                                         />
                                         <Text style={style.showText}>Inches: {height}</Text>
                                         <TouchableOpacity style={style.converterButton} onPress={() => setIsMetric(true)}>
-                                            <Text>Convert</Text>
+                                            <Text>Metric</Text>
                                         </TouchableOpacity>
                                         </>
                                     ) :
@@ -375,7 +375,7 @@ const toggleOption = (option) => {
                                         />
                                         <Text style={style.showText}>Centimeters: {heightCM}</Text>
                                         <TouchableOpacity style={style.converterButton} onPress={() => setIsMetric(false)}>
-                                            <Text>Convert</Text>
+                                            <Text>Imperial</Text>
                                         </TouchableOpacity>
                                         </>
                                     )
