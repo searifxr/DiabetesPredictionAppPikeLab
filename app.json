@@ -1,0 +1,23 @@
+{
+  "expo": {
+    "name": "heredity",
+    "slug": "heredity",
+    "version": "1.0.0",
+    "android": {
+      "package": "com.nihalonexpo.heredity"
+    },
+    "plugins": [
+      [
+        "expo-document-picker",
+        {
+          "iCloudContainerEnvironment": "Production"
+        }
+      ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "bb8ef8de-6649-403f-9e21-e57e1d8e4404"
+      }
+    }
+  }
+}
