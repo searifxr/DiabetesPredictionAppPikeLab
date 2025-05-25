@@ -2,14 +2,18 @@
 
 echo "Starting build process..."
 
-# Clean Python packages
-echo "Cleaning existing packages..."
-pip uninstall numpy -y
-pip uninstall scikit-learn -y
+# Remove previous installations
+echo "Removing previous installations..."
+pip uninstall -y numpy scikit-learn pandas joblib
+rm -rf /usr/local/lib/python*/site-packages/numpy*
+rm -rf /usr/local/lib/python*/site-packages/scikit_learn*
 
-# Install Python dependencies
-echo "Installing Python packages..."
+# Upgrade pip
+echo "Upgrading pip..."
 python -m pip install --upgrade pip
+
+# Install dependencies
+echo "Installing Python packages..."
 pip install -r requirements.txt --no-cache-dir
 
 # Install Node dependencies
@@ -18,5 +22,5 @@ npm install
 
 # Verify installations
 echo "Verifying installations:"
-python -c "import numpy; print(f'NumPy version: {numpy.__version__}')"
-python -c "import sklearn; print(f'Scikit-learn version: {sklearn.__version__}')"
+python -c "import numpy; print('NumPy installation successful')"
+python -c "import sklearn; print('Scikit-learn installation successful')"
