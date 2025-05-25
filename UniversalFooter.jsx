@@ -25,6 +25,7 @@ export default function UniversalFooter() {
         SelectedColor = 'orange'
         style = {styles.footerButtons}
         currentRoute={route.name}
+        navigateTo={'Analytics'}
     />
     <DynamicIcons
         name = "account-settings"
@@ -33,6 +34,7 @@ export default function UniversalFooter() {
         SelectedColor = 'orange'
         style = {styles.footerButtons}
         currentRoute={route.name}
+        navigateTo={'Profile'}
     />
       </View>
     );

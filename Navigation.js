@@ -6,6 +6,8 @@ import LearnMorePage from './LearnMore';
 import Predictions from './predictionPage';
 import EduResources from './EducationalResources';
 import TermsHealth from './TermsHealth';
+import Analytics from './Analytics';
+import Profile from './Profile';
 const stack = createStackNavigator();
 
 export default function Navigator () {
@@ -17,6 +19,8 @@ export default function Navigator () {
             <stack.Screen name='Predictions' component={Predictions}/>
             <stack.Screen name='EduResources' component={EduResources}/>
             <stack.Screen name='TermsHealth' component={TermsHealth}/>
+            <stack.Screen name='Analytics' component={Analytics}/>
+            <stack.Screen name='Profile' component={Profile}/>
         </stack.Navigator>
         <UniversalFooter/>
         </>
