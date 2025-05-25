@@ -1648,12 +1648,27 @@ useEffect(() => {
                                                             const API_URL = 'https://medrlx-diabetes-api.onrender.com'
                                                             const response = await fetch(`${API_URL}/api/predict`, {
                                                                 method: 'POST',
-                                                                headers: { 'Content-Type': 'application/json' },
+                                                                headers: { 'Content-Type': 'application/json',
+                                                                           'Accept': 'application/json'
+                                                                 },
                                                                 body: JSON.stringify(UserData),
                                                             });
                                                             const result = await response.json();
                                                             setIs_Loading(false);
-
+                                                            if(!response.ok)
+                                                            {
+                                                                const errorText = await response.text();
+                                                                console.error('API Error:', errorText)
+                                                                throw new Error(`HTTP error! status: ${response.status}`);
+                                                            }
+                                                            const contentType = response.headers.get('content-type');
+                                                            if (!contentType || !contentType.includes('application/json')) {
+                                                                throw new Error(`Invalid content type: ${contentType}`);
+                                                            }
+                                                            if (result.error) {
+                                                                Alert.alert('Error', result.error);
+                                                                return;
+                                                            }
                                                             if (result.prediction !== undefined) {
                                                                 Alert.alert(
                                                                     result.prediction === 1 ? "Diabetes Risk" : "Low Diabetes Risk",
