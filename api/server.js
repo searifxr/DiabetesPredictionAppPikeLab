@@ -3,36 +3,52 @@ const cors = require('cors');
 const { spawn } = require('child_process');
 
 const app = express();
-
 app.use(cors());
 app.use(express.json());
 
-app.post('/api/predict', (req, res) => {
-    const pythonProcess = spawn('python', ['predict.py', JSON.stringify(req.body)]);
-    let result = '';
+app.post('/api/predict', async (req, res) => {
+    try {
+        const pythonProcess = spawn('python', ['predict.py']);
+        let predictionData = '';
+        let errorData = '';
 
-    pythonProcess.stdout.on('data', (data) => {
-        result += data.toString();
-    });
+        // Send data to Python script
+        pythonProcess.stdin.write(JSON.stringify(req.body));
+        pythonProcess.stdin.end();
 
-    pythonProcess.stderr.on('data', (data) => {
-        console.error(`Error from Python: ${data}`);
-    });
+        // Collect prediction results
+        pythonProcess.stdout.on('data', (data) => {
+            predictionData += data.toString();
+        });
 
-    pythonProcess.on('close', (code) => {
-        if (code !== 0) {
-            return res.status(500).json({ error: 'Prediction failed' });
-        }
-        try {
-            const prediction = JSON.parse(result);
-            res.json(prediction);
-        } catch (error) {
-            res.status(500).json({ error: 'Invalid prediction result' });
-        }
-    });
+        // Collect any errors
+        pythonProcess.stderr.on('data', (data) => {
+            errorData += data.toString();
+        });
+
+        // Handle process completion
+        pythonProcess.on('close', (code) => {
+            if (code !== 0) {
+                console.error('Python Error:', errorData);
+                return res.status(500).json({ error: 'Prediction failed', details: errorData });
+            }
+            
+            try {
+                const result = JSON.parse(predictionData);
+                res.json(result);
+            } catch (e) {
+                console.error('JSON Parse Error:', e);
+                res.status(500).json({ 
+                    error: 'Failed to parse prediction result',
+                    raw: predictionData
+                });
+            }
+        });
+    } catch (error) {
+        console.error('Server Error:', error);
+        res.status(500).json({ error: error.message });
+    }
 });
 
-const PORT = 8082;
-app.listen(PORT, '0.0.0.0', () => {
-    console.log(`Server running on http://0.0.0.0:${PORT}`);
-});
+const PORT = process.env.PORT || 8082;
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
