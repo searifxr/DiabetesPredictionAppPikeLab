@@ -1644,53 +1644,39 @@ useEffect(() => {
                                                         };
 
                                                         try {
-                                                            setIs_Loading(true);
-                                                            const API_URL = 'https://medrlx-diabetes-api.onrender.com'
-                                                            const response = await fetch(`${API_URL}/api/predict`, {
-                                                                method: 'POST',
-                                                                headers: { 'Content-Type': 'application/json',
-                                                                           'Accept': 'application/json'
-                                                                 },
-                                                                body: JSON.stringify(UserData),
-                                                            });
-                                                            const result = await response.json();
-                                                            setIs_Loading(false);
-                                                            if(!response.ok)
-                                                            {
-                                                                const errorText = await response.text();
-                                                                console.error('API Error:', errorText)
-                                                                throw new Error(`HTTP error! status: ${response.status}`);
-                                                            }
-                                                            const contentType = response.headers.get('content-type');
-                                                            if (!contentType || !contentType.includes('application/json')) {
-                                                                throw new Error(`Invalid content type: ${contentType}`);
-                                                            }
-                                                            if (result.error) {
-                                                                Alert.alert('Error', result.error);
-                                                                return;
-                                                            }
-                                                            if (result.prediction !== undefined) {
+                                                                setIs_Loading(true);
+                                                                console.log('Sending request with data:', UserData); // Debug log
+
+                                                                const response = await fetch('http://your_ip_here:8082/api/predict', {
+                                                                    method: 'POST',
+                                                                    headers: {
+                                                                        'Content-Type': 'application/json'
+                                                                    },
+                                                                    body: JSON.stringify(UserData),
+                                                                    // Add timeout
+                                                                    
+                                                                });
+                                                            
+                                                                if (!response.ok) {
+                                                                    throw new Error(`Server error: ${response.status}`);
+                                                                }
+                                                            
+                                                                const result = await response.json();
+                                                                console.log('Received response:', result); // Debug log
+
+                                                                setIs_Loading(false);
+
+                                                                // Show result in alert
                                                                 Alert.alert(
-                                                                    result.prediction === 1 ? "Diabetes Risk" : "Low Diabetes Risk",
-                                                                    `Probability: ${(result.probability * 100).toFixed(2)}%\n\n${result.feedback ? result.feedback.join('\n') : ''}`,
-                                                                    [
-                                                                        {
-                                                                            text: "Understood",
-                                                                            onPress: () => {
-                                                                                navigation.navigate('WelcomeScreen');
-                                                                            }
-                                                                        }
-                                                                    ]
+                                                                    result.prediction === 1 ? "High Risk" : "Low Risk",
+                                                                    `Probability: ${(result.probability * 100).toFixed(2)}%`
                                                                 );
-                                                            } 
-                                                            else {
-                                                                Alert.alert("Error", "No prediction received from server.");
+                                                            
+                                                            } catch (error) {
+                                                                setIs_Loading(false);
+                                                                console.error('Error:', error);
+                                                                Alert.alert("Error", "Failed to get prediction. Please try again.");
                                                             }
-                                                        }
-                                                        catch (error) {
-                                                            setIs_Loading(false);
-                                                            Alert.alert("Error", `Failed to connect to the server. \n   ${error.message}`);
-                                                        }
                                                     }
                                                 }>
                                                     <Text>Submit</Text>

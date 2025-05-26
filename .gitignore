@@ -75,8 +75,8 @@ yarn-error.*
 .env.local
 .env.development
 .env.production
-
 node_modules/
+*.log
 __pychace__/
 *.pyc
 

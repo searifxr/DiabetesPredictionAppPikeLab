@@ -4,43 +4,37 @@ import numpy as np
 from joblib import load
 
 try:
-    # Read input from stdin
+    # Read from stdin instead of argv
     input_data = sys.stdin.read()
     data = json.loads(input_data)
     
-    # Load model and scaler
+    # Load model and scaler from same directory
     model = load('diabetes_model.pkl')
     scaler = load('scaler.pkl')
     
-    # Prepare input data
+    # Convert to numpy array directly
     features = np.array([
-        data['Pregnancies'],
-        data['Glucose'],
-        data['BloodPressure'],
-        data['SkinThickness'],
-        data['Insulin'],
-        data['BMI'],
-        data['DiabetesPedigreeFunction'],
-        data['Age']
-    ])
+        float(data['Pregnancies']),
+        float(data['Glucose']),
+        float(data['BloodPressure']), 
+        float(data['SkinThickness']),
+        float(data['Insulin']),
+        float(data['BMI']),
+        float(data['DiabetesPedigreeFunction']),
+        float(data['Age'])
+    ]).reshape(1, -1)
     
-    # Scale features
-    features_scaled = scaler.transform(features.reshape(1, -1))
-    
-    # Make prediction
+    # Scale and predict
+    features_scaled = scaler.transform(features)
     prediction = int(model.predict(features_scaled)[0])
     probability = float(model.predict_proba(features_scaled)[0][1])
     
-    # Return JSON response
-    result = {
-        "prediction": prediction,
-        "probability": probability
-    }
-    
-    print(json.dumps(result))
+    # Return result
+    print(json.dumps({
+        'prediction': prediction,
+        'probability': probability
+    }))
 
 except Exception as e:
-    error_response = {
-        "error": str(e)
-    }
-    print(json.dumps(error_response))
+    print(json.dumps({'error': str(e)}))
+    sys.exit(1)

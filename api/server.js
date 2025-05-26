@@ -3,52 +3,42 @@ const cors = require('cors');
 const { spawn } = require('child_process');
 
 const app = express();
+
+// Enable CORS and JSON parsing
 app.use(cors());
 app.use(express.json());
 
-app.post('/api/predict', async (req, res) => {
-    try {
-        const pythonProcess = spawn('python', ['predict.py']);
-        let predictionData = '';
-        let errorData = '';
+app.post('/api/predict', (req, res) => {
+    const python = spawn('python', ['predict.py']);
+    
+    python.stdin.write(JSON.stringify(req.body));
+    python.stdin.end();
 
-        // Send data to Python script
-        pythonProcess.stdin.write(JSON.stringify(req.body));
-        pythonProcess.stdin.end();
+    let dataFromPython = '';
 
-        // Collect prediction results
-        pythonProcess.stdout.on('data', (data) => {
-            predictionData += data.toString();
-        });
+    python.stdout.on('data', (data) => {
+        dataFromPython += data.toString();
+    });
 
-        // Collect any errors
-        pythonProcess.stderr.on('data', (data) => {
-            errorData += data.toString();
-        });
+    python.stderr.on('data', (data) => {
+        console.error(`Error from Python: ${data}`);
+    });
 
-        // Handle process completion
-        pythonProcess.on('close', (code) => {
-            if (code !== 0) {
-                console.error('Python Error:', errorData);
-                return res.status(500).json({ error: 'Prediction failed', details: errorData });
-            }
-            
-            try {
-                const result = JSON.parse(predictionData);
-                res.json(result);
-            } catch (e) {
-                console.error('JSON Parse Error:', e);
-                res.status(500).json({ 
-                    error: 'Failed to parse prediction result',
-                    raw: predictionData
-                });
-            }
-        });
-    } catch (error) {
-        console.error('Server Error:', error);
-        res.status(500).json({ error: error.message });
-    }
+    python.on('close', (code) => {
+        if (code !== 0) {
+            return res.status(500).json({ error: 'Failed to get prediction' });
+        }
+        try {
+            const result = JSON.parse(dataFromPython);
+            res.json(result);
+        } catch (error) {
+            res.status(500).json({ error: 'Invalid result format' });
+        }
+    });
 });
 
-const PORT = process.env.PORT || 8082;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+// Start server
+const PORT = 8082;
+app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+});
