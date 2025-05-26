@@ -2,23 +2,16 @@
 
 echo "Starting build process..."
 
-# Create and activate virtual environment
-python -m venv venv
-source venv/bin/activate
-
-# Upgrade pip and setuptools
-echo "Upgrading pip and setuptools..."
-python -m pip install --upgrade pip setuptools wheel
-
-# Install dependencies
+# Install Python dependencies
 echo "Installing Python packages..."
-pip install --no-cache-dir numpy
+python -m pip install --upgrade pip wheel setuptools
+pip install numpy==1.24.3 --no-cache-dir
 pip install -r requirements.txt --no-cache-dir
 
 # Install Node dependencies
 echo "Installing Node packages..."
 npm install
 
-# Verify installations
-echo "Verifying NumPy installation..."
-python -c "import numpy; print(f'NumPy version: {numpy.__version__}')"
+# Verify Python installation
+echo "Verifying Python packages..."
+python -c "import numpy; print('NumPy:', numpy.__version__)"
